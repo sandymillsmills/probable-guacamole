@@ -1,0 +1,251 @@
+
+ Sun ONE logo      Previous      Contents      Index      Next     
+
+Sun ONE Identity Server Deployment Guide
+Appendix F 
+Installing in a chroot Environment
+This appendix provides instructions for installing and running Sun™ ONE Identity Server in a chroot environment. This appendix contains the following sections:
+
+Overview
+Before Creating chroot
+Creating a chroot Environment
+Installing Identity Server Under chroot
+Starting Identity Server In chroot
+Identity Server Log Files In chroot
+Overview
+Chroot comes from the change root function in Unix®. When Identity Server is installed in a chroot environment, a named directory becomes the root directory. The new chroot directory then becomes the starting point in the path for all Identity Server searches. The chroot prevents malicious programs from accessing the real root file system, providing an added measure of security for the Web Server and Directory Server processes that power Identity Server.
+
+Before Creating chroot
+Before beginning the chroot creation process, the following points should be noted:
+
+You must have root privileges in UNIX or Administrator privileges in Windows® to install Identity Server in a chroot environment.
+Patches cannot be automatically installed in the chroot environment. If any patches have been installed to your system, they must be manually copied to the appropriate locations:
+Sun ONE Directory Server
+Sun ONE Web Server
+Sun ONE Identity Server
+Solaris
+Creating a chroot Environment
+Identity Server processes that serve requests cannot see or access files outside the chroot directory so the appropriate Identity Server files must be copied into the chroot directory structure. The first step is to create the user root environment for Identity Server. This new root must contain everything that Identity Server expects from the natural root (/).
+
+Note
+
+$CHROOT is the variable name for the chroot directory.
+
+Create the following system directories on the computer system that will host Identity Server.
+/dev
+
+/etc
+
+/sbin
+
+/usr
+
+/var
+
+/proc
+
+/opt
+
+/etc/lib
+
+/usr/platform
+
+/usr/bin
+
+/usr/sbin
+
+/usr/lib
+
+/usr/openwin/lib
+
+/var/opt
+
+/var/tmp
+
+/usr/share
+
+/usr/share/lib
+
+Create system soft links using the command ln -s.
+The following soft links should be created:
+
+/usr/bin -> bin
+/usr/lib -> lib
+/var/tmp -> tmp
+Create devices under $CHROOT using the command mknod.
+Tip
+
+For example, to create the device /dev/tcp under the $CHROOT directory, enter:
+
+mknod dev/tcp c 11 42
+
+The following devices should be created under the $CHROOT directory:
+
+/dev/null
+/dev/tcp
+/dev/ticots
+/dev/ticlts
+/dev/ticotsord
+/dev/tty
+/dev/udp
+/dev/zero
+/dev/conslog
+Copy files from directory /etc to corresponding locations under the $CHROOT directory. (For example, copy /etc/hosts to $CHROOT/etc/hosts.)
+The following files should be copied:
+
+/etc/hosts
+/etc/nsswitch.conf
+/etc/vfstab
+/etc/group
+/etc/passwd
+/etc/shadow
+/etc/hosts
+/etc/resolv.conf
+/etc/nsswitch.conf
+Copy binaries to the corresponding locations under the $CHROOT directory. (For example, copy /usr/bin/sh to $CHROOT/usr/bin/sh.)
+The following files should be copied:
+
+/usr/bin/sh
+/usr/bin/ls
+/usr/bin/cat
+/usr/bin/date
+/usr/bin/dirname
+/usr/bin/mv
+/usr/bin/expr
+/usr/bin/file
+/usr/bin/awk
+/usr/bin/grep
+/usr/bin/gettext
+/usr/bin/echo
+/usr/bin/rm
+/usr/bin/sed
+/usr/bin/sleep
+/usr/bin/hostname
+/usr/bin/domainname
+/usr/bin/cut
+/usr/bin/uname
+/usr/bin/ksh
+/usr/bin/basename
+/usr/bin/id
+/usr/bin/chmod
+/usr/bin/nohup
+/usr/bin/pkginfo
+/usr/bin/su
+/usr/bin/chown
+/usr/bin/ftp
+/usr/bin/isainfo
+/usr/bin/ldd
+/usr/bin/truss
+/usr/bin/rm
+/usr/xpg4/bin/id
+Copy libraries to corresponding locations under the $CHROOT directory. (For example, copy /usr/lib/libc.so* to $CHROOT/usr/lib/.)
+Note
+
+If the computer system in which Identity Server is installed is a 64-bit machine, the libraries from /usr/lib/64 and /usr/lib/lwp/64 need to be copied to $CHROOT/usr/lib/64 and $CHROOT/usr/lib/lwp/64, respectively.
+
+The following files should be copied:
+
+/usr/lib/libc.so*
+/usr/lib/ld.so*
+/usr/lib/libdl.so*
+/usr/lib/libintl.so*
+/usr/lib/libnsl.so*
+/usr/lib/libsocket.so*
+/usr/lib/librpcsvc.so*
+/usr/lib/libw.so*
+/usr/lib/libproject*
+/usr/lib/libproc*
+/usr/lib/libsecdb*
+/usr/lib/libcmd*
+/usr/lib/libmp.so*
+/usr/lib/libm.so*
+/usr/lib/libresolv.so*
+/usr/lib/nss_dns.so*
+/usr/lib/nss_files.so*
+/usr/lib/nss_nis.so*
+/usr/lib/nss_nisplus.so*
+/usr/lib/straddr.so*
+/usr/lib/libthread.so*
+/usr/lib/libposix4.so*
+/usr/lib/libC.so*
+/usr/lib/librt.so*
+/usr/lib/libaio.so*
+/usr/lib/libelf.so*
+/usr/lib/libgen.so*
+/usr/lib/libpthread.so*
+/usr/lib/libadm.so*
+/usr/lib/libX*
+/usr/lib/libCrun.so*
+/usr/lib/libatomic.so*
+/usr/lib/libdhcpagent.so*
+/usr/lib/libproject.so*
+/usr/lib/libpam.so*
+/usr/lib/libbsm.so*
+/usr/lib/libsldap.so*
+/usr/lib/libldap.so*
+/usr/lib/libdoor.so*
+/usr/lib/libz.so*
+/usr/lib/libkstat*
+/usr/lib/libld.so*
+/usr/lib/liblddbg.so*
+/usr/lib/librtld.so*
+/usr/lib/libsh.so*
+/usr/lib/lddstub*
+/usr/lib/librtld_db.so*
+/usr/lib/libmd5.so*
+/usr/lib/locale
+/usr/lib/libCstd.so*
+Copy the zoneinfo files to corresponding locations under the $CHROOT directory. (For example, copy /usr/share/lib/zoneinfo/* to $CHROOT/usr/share/lib/.)
+Copy the locale files to corresponding locations under the $CHROOT directory. (For example, copy /usr/lib/locale/* to $CHROOT/usr/lib/locale.)
+Installing Identity Server Under chroot
+Install Identity Server 6.1 in a directory other than $CHROOT.
+If an installation directory is not specified, Identity Server is installed, by default, in /opt/IdentityServer_base .
+
+Stop the instance of Sun ONE Web Server.
+./WebServer_base/https-instanceName/https-stop
+
+Stop the instance of Sun ONE Directory Server.
+./DirectoryServer_base/slapd-instanceName/stop-slapd
+
+Copy the entire Identity Server directly from IdentityServer_base to the $CHROOT directory using the same structure.
+Copy files from the following locations to the corresponding directories under $CHROOT:
+/etc/opt/SUNWam
+/var/opt/SUNWam
+/etc/init.d/amserver
+Create a loopback mount for Java.
+The following command makes Identity Server ready to run under chroot environment:
+
+mount -F lofs /usr/j2se $CHROOT/usr/j2se
+
+Create a loopback mount for /usr/share/lib and /usr/lib/mps.
+Examples:
+
+mount -F lofs /usr/share/lib $CHROOT/usr/share/lib
+
+mount -F lofs /usr/lib/mps $CHROOT/usr/lib/mps
+
+Starting Identity Server In chroot
+To start Identity Server in the chroot environment, both Directory Server and Web Server must be started.
+
+Start Directory Server using the chroot command:
+chroot $ROOT $IS_ROOT/DSServers/slapd-hostName/start-slapd
+
+Start Web Server using the chroot command:
+chroot $ROOT $IS_ROOT/SUNWam/servers/https-instanceName/https-start
+
+Identity Server Log Files In chroot
+Identity Server normally creates log files (Error Log, Debug, etc.) in the following directory:
+
+/var/opt/SUNWam/debug and /var/opt/SUNWam/logs
+
+Under chroot these log files will be created at the following locations:
+
+$CHROOT/var/opt/SUNWam/log
+
+$CHROOT/var/opt/SUNWam/debug
+
+
+
+Previous      Contents      Index      Next     
+
+Copyright 2003 Sun Microsystems, Inc. All rights reserved.
